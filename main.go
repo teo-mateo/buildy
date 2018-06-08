@@ -59,10 +59,10 @@ func main(){
 	fmt.Println("Hello fish")
 
 	var f string
-	var cmdString = "~/containers/{container}/build.sh"
+	var cmdString string
 
 	flag.StringVar(&f, "file", "", "--file /file/to/watch")
-	flag.StringVar(&cmdString, "cmd", "", "--cmd=<some-command{container}>")
+	flag.StringVar(&cmdString, "cmd", "~/containers/{container}/build.sh", "--cmd=<some-command{container}>")
 	flag.Parse()
 
 	if f == ""{
