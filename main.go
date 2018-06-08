@@ -116,7 +116,7 @@ func main(){
 						}
 						fmt.Printf("%v %s\n", ts, container)
 
-						cmdString = strings.Replace(cmdString, "{container", container, 1)
+						cmdString = strings.Replace(cmdString, "{container}", container, 1)
 						cmd := exec.Command(cmdString)
 						err = cmd.Run()
 						if err != nil{
