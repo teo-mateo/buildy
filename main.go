@@ -11,6 +11,7 @@ import (
 	"strings"
 	"errors"
 	"os/exec"
+	"bytes"
 )
 
 func readLastLine(f string) (line string, err error) {
@@ -118,10 +119,21 @@ func main(){
 
 						cmdString = strings.Replace(cmdString, "{container}", container, 1)
 						cmd := exec.Command(cmdString)
+
+						var outbuf, errbuf bytes.Buffer
+						cmd.Stdout = &outbuf
+						cmd.Stderr = &errbuf
+
 						err = cmd.Run()
 						if err != nil{
 							fmt.Println(err)
 						}
+
+						stdout := outbuf.String()
+						fmt.Println(stdout)
+
+						stderr := errbuf.String()
+						fmt.Println(stderr)
 					}
 					lastChange = time.Now()
 				}
