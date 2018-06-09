@@ -118,6 +118,7 @@ func main(){
 						fmt.Printf("%v %s\n", ts, container)
 
 						cmdString = strings.Replace(cmdString, "{container}", container, 1)
+						fmt.Printf("Executing: %s\n", cmdString)
 						cmd := exec.Command(cmdString)
 
 						var outbuf, errbuf bytes.Buffer
