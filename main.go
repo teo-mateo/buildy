@@ -101,42 +101,18 @@ func main(){
 				if time.Since(lastChange).Seconds() > 1{
 					log.Println("event:",event)
 					if event.Op&fsnotify.Write == fsnotify.Write{
-						log.Println("file was modified")
 
-						lastLine, err := readLastLine(f)
-						if err != nil{
-							log.Println(err)
-							os.Exit(1)
-						}
-						fmt.Printf("Last line: %s\n", lastLine)
+						//wait 2 sec before reading file.
+						go func() {
+							time.Sleep(2 * time.Second)
+							handleChange(f, cmdString)
+						}()
 
-						ts, container, err := parseLine(lastLine)
-						if err != nil{
-							log.Println(err)
-							os.Exit(1)
-						}
-						fmt.Printf("%v %s\n", ts, container)
-
-						cmdString = strings.Replace(cmdString, "{container}", container, 1)
-						fmt.Printf("Executing: %s\n", cmdString)
-						cmd := exec.Command(cmdString)
-
-						var outbuf, errbuf bytes.Buffer
-						cmd.Stdout = &outbuf
-						cmd.Stderr = &errbuf
-
-						err = cmd.Run()
-						if err != nil{
-							fmt.Println(err)
-						}
-
-						stdout := outbuf.String()
-						fmt.Println(stdout)
-
-						stderr := errbuf.String()
-						fmt.Println(stderr)
 					}
 					lastChange = time.Now()
+				} else {
+					fmt.Println("mumble mumble...")
+					fmt.Println(event.Op)
 				}
 			case err := <- watcher.Errors:
 				log.Println("error:", err)
@@ -153,4 +129,41 @@ func main(){
 	}
 
 	<-done
+}
+
+func handleChange(f string, cmdString string){
+	log.Println("file was modified")
+
+	lastLine, err := readLastLine(f)
+	if err != nil{
+		log.Println(err)
+		os.Exit(1)
+	}
+	fmt.Printf("Last line: %s\n", lastLine)
+
+	ts, container, err := parseLine(lastLine)
+	if err != nil{
+		log.Println(err)
+		os.Exit(1)
+	}
+	fmt.Printf("%v %s\n", ts, container)
+
+	cmdString = strings.Replace(cmdString, "{container}", container, 1)
+	fmt.Printf("Executing: %s\n", cmdString)
+	cmd := exec.Command(cmdString)
+
+	var outbuf, errbuf bytes.Buffer
+	cmd.Stdout = &outbuf
+	cmd.Stderr = &errbuf
+
+	err = cmd.Run()
+	if err != nil{
+		fmt.Println(err)
+	}
+
+	stdout := outbuf.String()
+	fmt.Println(stdout)
+
+	stderr := errbuf.String()
+	fmt.Println(stderr)
 }
